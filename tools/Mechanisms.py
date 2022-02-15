@@ -19,10 +19,12 @@ class Mechanisms():
                 print('unknown error capturing screen!')
     
     def locate_object(self, template:str):
-        match = cv2.matchTemplate(cv2.imread('./tools/ss_cache/screen.png', cv2.IMREAD_UNCHANGED), cv2.imread(template, cv2.IMREAD_UNCHANGED), cv2.TM_CCOEFF_NORMED)
+        match = cv2.matchTemplate(cv2.imread('./tools/ss_cache/screen.png'), cv2.imread(template), cv2.TM_CCOEFF_NORMED)
         min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match)
         threshold = 0.8
+
         if max_val >= threshold:
             pyautogui.moveTo(x=min_loc[0], y=min_loc[1])
 
-        
+        temp_shape = cv2.imread(template).shape[0]
+        print(temp_shape)
