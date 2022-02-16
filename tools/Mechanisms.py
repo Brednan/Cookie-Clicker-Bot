@@ -22,7 +22,8 @@ class Mechanisms():
 
         if max_val >= threshold:
             coordinates = max_loc
-            coordinates = tuple(map(lambda a, b: a - b, coordinates, temp_shape[0:2]))
+            print(len(temp_shape[0:2]))
+            coordinates = tuple(map(lambda a, b: a + b, coordinates, temp_shape[0:2]))
             return (coordinates)
 
         else:
