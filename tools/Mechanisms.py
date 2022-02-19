@@ -2,7 +2,8 @@ import mss
 from PIL import Image
 import cv2
 import pyautogui
-import numpy as np
+import ctypes
+import time
 
 class Mechanisms():
     def take_screenshot(self, monitor:int, cache_path):
@@ -14,20 +15,30 @@ class Mechanisms():
             img.save(fp=cache_path, format='PNG')
 
     
-    def locate_object(self, template:str, threshold):
-        match = cv2.matchTemplate(cv2.imread('./tools/ss_cache/screen.png'), cv2.imread(template), cv2.TM_CCOEFF_NORMED)
-        min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match)
-        threshold = 0.8
-        temp_shape = cv2.imread(template).shape
-
-        if max_val >= threshold:
-            coordinates = max_loc
-            print(len(temp_shape[0:2]))
-            coordinates = tuple(map(lambda a, b: a + b, coordinates, temp_shape[0:2]))
-            return (coordinates)
-
-        else:
+    def locate_object_template_match(self, template:str, threshold, screen):
+        try:
+            match = cv2.matchTemplate(screen, cv2.imread(template), cv2.TM_CCOEFF_NORMED)
+            temp_shape = cv2.imread(template).shape
+            min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match)
+            
+            if max_val >= threshold:
+                max_loc = (max_loc[0] + 10, max_loc[1] + 10)
+                return max_loc
+            
+            else:
+                return None
+        except:
             return None
+
     
-    def click_object(self, location):
-        pyautogui.moveTo(x=location[0], y=location[1])
+    def click_object(self, location, amount, interval):
+        ctypes.windll.user32.SetCursorPos(int(location[0]) + 1920, int(location[1]))
+        pyautogui.click(clicks=amount, interval=interval)
+    
+    def locate_cascade(self, cascade_path, screen):
+        cascade_cookie = cv2.CascadeClassifier(cascade_path)
+        loc = cascade_cookie.detectMultiScale(screen, minNeighbors=15)
+
+        print(loc)
+        return loc[0]
+        
