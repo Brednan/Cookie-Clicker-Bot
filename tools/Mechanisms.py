@@ -1,5 +1,5 @@
 import mss
-from PIL import Image
+from PIL import Image, ImageGrab
 import cv2
 import pyautogui
 import ctypes
@@ -22,7 +22,7 @@ class Mechanisms():
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match)
             
             if max_val >= threshold:
-                max_loc = (max_loc[0] + 10, max_loc[1] + 10)
+                max_loc = (max_loc[0], max_loc[1])
                 return max_loc
             
             else:
@@ -31,8 +31,8 @@ class Mechanisms():
             return None
 
     
-    def click_object(self, location, amount, interval):
-        ctypes.windll.user32.SetCursorPos(int(location[0]) + 1920, int(location[1]))
+    def click_object(self, location, amount, interval, monitor):
+        ctypes.windll.user32.SetCursorPos(int(location[0]) + ((monitor-1)*1920), int(location[1]))
         pyautogui.click(clicks=amount, interval=interval)
     
     def locate_cascade(self, cascade_path, screen):

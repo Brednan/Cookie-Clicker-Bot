@@ -1,6 +1,6 @@
 from tools.Bot import Bot
 
-monitor = input('Select Monitor: ')
+monitor = int(input('Select Monitor: '))
 
 bot = Bot(monitor)
 bot.bot_sequence()
