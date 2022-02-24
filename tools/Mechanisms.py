@@ -31,14 +31,14 @@ class Mechanisms():
             return None
 
     
-    def click_object(self, location, amount, interval):
-        ctypes.windll.user32.SetCursorPos(int(location[0]) + 1920, int(location[1]))
+    def click_object(self, location, amount, interval, monitor):
+        ctypes.windll.user32.SetCursorPos(int(location[0]) + ((monitor-1) * 1920), int(location[1]))
         pyautogui.click(clicks=amount, interval=interval)
     
     def locate_cascade(self, cascade_path, screen):
         cascade_cookie = cv2.CascadeClassifier(cascade_path)
         loc = cascade_cookie.detectMultiScale(screen, minNeighbors=15)
-
+        
         print(loc)
         return loc[0]
         

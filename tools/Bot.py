@@ -22,7 +22,7 @@ class Bot:
             listener = keyboard.Listener(on_press=lambda key:self.on_press(key))
             listener.start()
             try:
-                mechanisms.take_screenshot(2, './tools/ss_cache/screen.png')
+                mechanisms.take_screenshot(self.monitor, './tools/ss_cache/screen.png')
                 screen = cv2.imread('./tools/ss_cache/screen.png')
 
                 self.check_factory(screen)
@@ -36,16 +36,16 @@ class Bot:
     def on_press(self, key):
         self.is_active = False
     
-    def click_cookie(self, mechanisms, screen):
+    def click_cookie(self, screen):
         cookie = mechanisms.locate_object_template_match('./resources/cookie.png', 0.5, screen)
         if len(cookie) > 0:
-            mechanisms.click_object((cookie[0], cookie[1]), 200, 0.000001)
+            mechanisms.click_object((cookie[0], cookie[1]), 200, 0.000001, self.monitor)
 
     def check_factory(self, screen):
         factory_loc = mechanisms.locate_object_template_match('./resources/Factory.png', 0.95, screen)
         if factory_loc != None:
             try:
-                mechanisms.click_object(factory_loc, 1, 0)
+                mechanisms.click_object(factory_loc, 1, 0, self.monitor)
                 mouse.move(-10, 0)
             except:
                 pass
@@ -54,7 +54,7 @@ class Bot:
         farm_loc = mechanisms.locate_object_template_match('./resources/Farm.png', 0.95, screen)
         if farm_loc != None:
             try:
-                mechanisms.click_object(farm_loc, 1, 0)
+                mechanisms.click_object(farm_loc, 1, 0, self.monitor)
                 mouse.move(-10, 0)
             except:
                 pass
