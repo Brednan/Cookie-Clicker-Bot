@@ -16,6 +16,7 @@ class Bot:
         self.is_active = True
         self.mines = 0
         self.farms = 0
+        self.grandmas = 0
     def bot_sequence(self):
         self.is_active = True
         while True:
@@ -36,18 +37,27 @@ class Bot:
                     except:
                         pass
 
-                self.check_store(screen, template='./resources/plastic_mouse.png', threshold=0.95)
+                self.check_store(screen, template='./resources/plastic_mouse.png', threshold=1)
+                self.check_store(screen, template='./resources/reinforced_index_finger.png', threshold=1)
 
                 mechanisms.take_screenshot(self.monitor, './tools/ss_cache/screen.png')
                 screen = cv2.imread('./tools/ss_cache/screen.png')
 
                 if self.mines <= 5:
-                    plastic_mouse_available = mechanisms.locate_object_template_match('./resources/plastic_mouse.png', 0.95, screen)
-                    if plastic_mouse_available == None:
-                        mine_available = self.check_store(screen, './resources/Mine.png', 0.97)
-                        if mine_available == True:
-                            self.mines +=1
-                            time.sleep(0.01)
+                    mine_available = self.check_store(screen, './resources/Mine.png', 0.97)
+                    if mine_available == True:
+                        self.mines +=1
+                        time.sleep(0.01)
+                
+                if self.grandmas <= 10:
+                    grandma_loc = mechanisms.locate_object_template_match('./resources/grandma.png', threshold=1, screen=screen)
+                    if grandma_loc != None:
+                        if len(grandma_loc) > 0:
+                            try:
+                                mechanisms.click_object(amount=1, location=grandma_loc, interval=0, monitor=self.monitor)
+                                self.grandmas += 1
+                            except:
+                                pass
 
                 mechanisms.take_screenshot(self.monitor, './tools/ss_cache/screen.png')
                 screen = cv2.imread('./tools/ss_cache/screen.png')
@@ -80,9 +90,6 @@ class Bot:
                 pass
 
     def check_farm(self, screen):
-        dont_check = mechanisms.locate_object_template_match('./resources/120_per_second.png', 0.95, screen)
-        factory_unlocked = mechanisms.locate_object_template_match('./resources/dont_check_farm.png', 0.95, screen)
-        factory_purchase = mechanisms.locate_object_template_match('./resources/Factory.png', 0.95, screen)
         plastic_mouse_available = mechanisms.locate_object_template_match('./resources/plastic_mouse.png', 0.95, screen)
         if plastic_mouse_available == None:
             farm_loc = mechanisms.locate_object_template_match('./resources/Farm.png', 0.96, screen)
@@ -101,8 +108,6 @@ class Bot:
         if obj != None:
             try:
                 mechanisms.click_object(obj, 1, 0, self.monitor)
-                return True
             except:
-                return False
-        return False
+                pass
 
