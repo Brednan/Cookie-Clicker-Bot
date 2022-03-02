@@ -4,6 +4,7 @@ import cv2
 import pyautogui
 import ctypes
 import time
+import numpy as np
 
 class Mechanisms():
     def take_screenshot(self, monitor:int, cache_path):
@@ -41,4 +42,17 @@ class Mechanisms():
 
         print(loc)
         return loc[0]
-        
+
+    def color_detector(self, img):
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+
+        lower_bound = np.array([96, 120, 89])
+        upper_bound = np.array([99, 244, 99])
+
+        mask = cv2.inRange(hsv, lower_bound, upper_bound)
+        obj = cv2.bitwise_and(img, img)
+        print(obj)
+        cv2.imshow('img', obj)
+        cv2.waitKey(0)
+
+
