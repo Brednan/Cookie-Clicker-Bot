@@ -14,9 +14,8 @@ class Bot:
     def __init__(self, monitor):
         self.monitor = monitor
         self.is_active = True
-        self.mines = 0
-        self.farms = 0
-        self.grandmas = 0
+        self.has_plastic_mouse = False
+
     def bot_sequence(self):
         self.is_active = True
         while True:
@@ -37,19 +36,22 @@ class Bot:
                     except:
                         pass
 
-                mechanisms.take_screenshot(self.monitor, './tools/ss_cache/screen.png')
-                screen = cv2.imread('./tools/ss_cache/screen.png')
+                if self.has_plastic_mouse == True:
+                    mechanisms.take_screenshot(self.monitor, './tools/ss_cache/screen.png')
+                    screen = cv2.imread('./tools/ss_cache/screen.png')
 
-                self.check_factory(screen)
-                self.check_store(screen, template='./resources/Mine.png', threshold=0.9)                
-                self.check_farm(screen)
+                    self.check_factory(screen)
+                    self.check_store(screen, template='./resources/Mine.png', threshold=0.9)                
+                    self.check_farm(screen)
 
-                grandma_loc = mechanisms.locate_object_template_match('./resources/grandma.png', threshold=0.93, screen=screen)
-                if grandma_loc !=None:
-                    if len(grandma_loc) > 0:
-                        mechanisms.click_object(amount=1, location=grandma_loc, interval=0, monitor=self.monitor)
+                    grandma_loc = mechanisms.locate_object_template_match('./resources/grandma.png', threshold=0.93, screen=screen)
+                    if grandma_loc !=None:
+                        if len(grandma_loc) > 0:
+                            mechanisms.click_object(amount=1, location=grandma_loc, interval=0, monitor=self.monitor)
 
-                self.check_store(screen, template='./resources/plastic_mouse.png', threshold=1)
+                else:
+                    if self.check_store(screen, template='./resources/plastic_mouse.png', threshold=0.95) == True:
+                        self.has_plastic_mouse = True
                 self.check_store(screen, template='./resources/reinforced_index_finger.png', threshold=1)
 
                 self.click_cookie(screen)
@@ -82,7 +84,6 @@ class Bot:
             try:
                 mechanisms.click_object(farm_loc, 1, 0, self.monitor)
                 mouse.move(-10, 0)
-                self.farms += 1
             except:
                 pass
 
@@ -91,6 +92,8 @@ class Bot:
         if obj != None:
             try:
                 mechanisms.click_object(obj, 1, 0, self.monitor)
+                return True
             except:
-                pass
+                return False
+        return False
 
