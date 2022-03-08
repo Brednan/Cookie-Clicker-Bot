@@ -1,20 +1,17 @@
+from numpy import var
 from .Mechanisms import *
 import traceback
 import ctypes
 from pynput import mouse, keyboard
+from .parse_variables_json import read_json, write_json
 
-# keyboard_obj = keyboard.Controller()
-# mouse_obj = keyboard.Controller()
-
-
+variables_path = './tools/variables.json'
 mechanisms = Mechanisms()
-
 
 class Bot:
     def __init__(self, monitor):
         self.monitor = monitor
         self.is_active = True
-        self.has_plastic_mouse = False
 
     def bot_sequence(self):
         self.is_active = True
@@ -35,8 +32,8 @@ class Bot:
                         mechanisms.click_object(achievements_ignore, 1, 0, self.monitor)
                     except:
                         pass
-
-                if self.has_plastic_mouse == True:
+                variables = read_json(variables_path)
+                if variables['has_plastic_mouse'] == True:
                     mechanisms.take_screenshot(self.monitor, './tools/ss_cache/screen.png')
                     screen = cv2.imread('./tools/ss_cache/screen.png')
 
@@ -51,7 +48,7 @@ class Bot:
 
                 else:
                     if self.check_store(screen, template='./resources/plastic_mouse.png', threshold=0.95) == True:
-                        self.has_plastic_mouse = True
+                        variables['has_plastic_mouse'] = True
                 self.check_store(screen, template='./resources/reinforced_index_finger.png', threshold=1)
 
                 self.click_cookie(screen)
