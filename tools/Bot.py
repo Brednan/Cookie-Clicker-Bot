@@ -47,11 +47,17 @@ class Bot:
                             mechanisms.click_object(amount=1, location=grandma_loc, interval=0, monitor=self.monitor)
 
                 else:
-                    if self.check_store(screen, template='./resources/plastic_mouse.png', threshold=0.95) == True:
-                        variables['has_plastic_mouse'] = True
-                self.check_store(screen, template='./resources/reinforced_index_finger.png', threshold=1)
+                    if self.check_store(screen, template='./resources/plastic_mouse.png', threshold=0.98) == True:
+                        mechanisms.take_screenshot(self.monitor, './tools/ss_cache/screen.png')
+                        time.sleep(0.1)
+                        icon_visible = mechanisms.locate_object_template_match('./resources/plastic_mouse.png', threshold=0.93, screen=screen)
+                        if len(icon_visible) <= 0:
+                            variables['has_plastic_mouse'] = True
 
+                self.check_store(screen, template='./resources/reinforced_index_finger.png', threshold=1)
                 self.click_cookie(screen)
+
+                write_json('./tools/variables.json', variables)
 
             except Exception as e:
                 print(traceback(e))
