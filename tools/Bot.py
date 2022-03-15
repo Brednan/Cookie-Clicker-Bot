@@ -1,3 +1,4 @@
+from cv2 import threshold
 from numpy import var
 from .Mechanisms import *
 import traceback
@@ -33,28 +34,18 @@ class Bot:
                     except:
                         pass
                 variables = read_json(variables_path)
-                if variables['has_plastic_mouse'] == True:
-                    mechanisms.take_screenshot(self.monitor, './tools/ss_cache/screen.png')
-                    screen = cv2.imread('./tools/ss_cache/screen.png')
 
+                self.check_store(screen, './resources/plastic_mouse.png', 0.98)
+                if mechanisms.locate_object_template_match('./resources/Bank.png', threshold=0.9, screen=screen) != None:
+                    self.check_store(screen, template='./resources/Bank.png', threshold=0.9)
+
+                elif mechanisms.locate_object_template_match('./resources/Factory.png', threshold=0.9, screen=screen) != None:
                     self.check_factory(screen)
-                    self.check_store(screen, template='./resources/Mine.png', threshold=0.9)                
+                    
+                else:
+                    self.check_store(screen, template='./resources/Mine.png', threshold=0.96)
                     self.check_farm(screen)
 
-                    grandma_loc = mechanisms.locate_object_template_match('./resources/grandma.png', threshold=0.93, screen=screen)
-                    if grandma_loc !=None:
-                        if len(grandma_loc) > 0:
-                            mechanisms.click_object(amount=1, location=grandma_loc, interval=0, monitor=self.monitor)
-
-                else:
-                    if self.check_store(screen, template='./resources/plastic_mouse.png', threshold=0.98) == True:
-                        mechanisms.take_screenshot(self.monitor, './tools/ss_cache/screen.png')
-                        time.sleep(0.1)
-                        icon_visible = mechanisms.locate_object_template_match('./resources/plastic_mouse.png', threshold=0.93, screen=screen)
-                        if len(icon_visible) <= 0:
-                            variables['has_plastic_mouse'] = True
-
-                self.check_store(screen, template='./resources/reinforced_index_finger.png', threshold=1)
                 self.click_cookie(screen)
 
                 write_json('./tools/variables.json', variables)
@@ -70,23 +61,21 @@ class Bot:
         cookie = mechanisms.locate_object_template_match('./resources/cookie.png', 0.7, screen)
         if cookie != None:
             if len(cookie) > 0:
-                mechanisms.click_object((cookie[0], cookie[1]), 400, 0.000001, self.monitor)
+                mechanisms.click_object((cookie[0], cookie[1]), 800, 0.000001, self.monitor)
 
     def check_factory(self, screen):
         factory_loc = mechanisms.locate_object_template_match('./resources/Factory.png', 0.97, screen)
         if factory_loc != None:
             try:
                 mechanisms.click_object(factory_loc, 1, 0, self.monitor)
-                mouse.move(-10, 0)
             except:
                 pass
 
     def check_farm(self, screen):
         farm_loc = mechanisms.locate_object_template_match('./resources/Farm.png', 0.96, screen)
-        if farm_loc != None and self.farms <= 10:
+        if farm_loc != None:
             try:
                 mechanisms.click_object(farm_loc, 1, 0, self.monitor)
-                mouse.move(-10, 0)
             except:
                 pass
 
@@ -95,8 +84,6 @@ class Bot:
         if obj != None:
             try:
                 mechanisms.click_object(obj, 1, 0, self.monitor)
-                return True
+                pass
             except:
-                return False
-        return False
-
+                pass
