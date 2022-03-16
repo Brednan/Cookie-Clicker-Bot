@@ -18,7 +18,7 @@ class Mechanisms():
     
     def locate_object_template_match(self, template:str, threshold, screen):
         try:
-            match = cv2.matchTemplate(screen, cv2.imread(template), cv2.TM_CCOEFF_NORMED)
+            match = cv2.matchTemplate(screen, cv2.imread(template), cv2.TM_CCORR_NORMED)
             temp_shape = cv2.imread(template).shape
             min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(match)
 

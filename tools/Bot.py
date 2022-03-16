@@ -35,15 +35,15 @@ class Bot:
                         pass
                 variables = read_json(variables_path)
 
-                self.check_store(screen, './resources/plastic_mouse.png', 0.98)
-                if mechanisms.locate_object_template_match('./resources/Bank.png', threshold=0.9, screen=screen) != None:
-                    self.check_store(screen, template='./resources/Bank.png', threshold=0.9)
+                self.check_store(screen, './resources/plastic_mouse.png', 0.99)
+                if mechanisms.locate_object_template_match('./resources/Bank.png', threshold=0.999, screen=screen) != None:
+                    self.check_store(screen, template='./resources/Bank.png', threshold=0.999)
 
-                elif mechanisms.locate_object_template_match('./resources/Factory.png', threshold=0.9, screen=screen) != None:
+                elif mechanisms.locate_object_template_match('./resources/Factory.png', threshold=0.999, screen=screen) != None:
                     self.check_factory(screen)
                     
                 else:
-                    self.check_store(screen, template='./resources/Mine.png', threshold=0.96)
+                    self.check_store(screen, template='./resources/Mine.png', threshold=0.999)
                     self.check_farm(screen)
 
                 self.click_cookie(screen)
@@ -64,7 +64,7 @@ class Bot:
                 mechanisms.click_object((cookie[0], cookie[1]), 800, 0.000001, self.monitor)
 
     def check_factory(self, screen):
-        factory_loc = mechanisms.locate_object_template_match('./resources/Factory.png', 0.97, screen)
+        factory_loc = mechanisms.locate_object_template_match('./resources/Factory.png', 0.99999, screen)
         if factory_loc != None:
             try:
                 mechanisms.click_object(factory_loc, 1, 0, self.monitor)
@@ -72,7 +72,7 @@ class Bot:
                 pass
 
     def check_farm(self, screen):
-        farm_loc = mechanisms.locate_object_template_match('./resources/Farm.png', 0.96, screen)
+        farm_loc = mechanisms.locate_object_template_match('./resources/Farm.png', 0.99999, screen)
         if farm_loc != None:
             try:
                 mechanisms.click_object(farm_loc, 1, 0, self.monitor)
