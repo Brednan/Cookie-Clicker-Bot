@@ -5,14 +5,22 @@ import traceback
 import ctypes
 from pynput import mouse, keyboard
 from .parse_variables_json import read_json, write_json
+import os
 
 variables_path = './tools/variables.json'
 mechanisms = Mechanisms()
 
 class Bot:
-    def __init__(self, monitor):
+    def __init__(self, monitor, restart):
         self.monitor = monitor
         self.is_active = True
+        self.variables = read_json('./tools/variables.json')
+
+        if restart == 'y':
+            self.variables['grandmas_amount'] = 0
+            self.variables['Farm_amount'] = 0
+            self.variables['Mine_amount'] = 0
+            self.variables['Factory_amount'] = 0
 
     def bot_sequence(self):
         self.is_active = True
@@ -33,22 +41,18 @@ class Bot:
                         mechanisms.click_object(achievements_ignore, 1, 0, self.monitor)
                     except:
                         pass
-                variables = read_json(variables_path)
+                self.variables = read_json(variables_path)
 
-                self.check_store(screen, './resources/plastic_mouse.png', 0.99)
-                if mechanisms.locate_object_template_match('./resources/Bank.png', threshold=0.999, screen=screen) != None:
-                    self.check_store(screen, template='./resources/Bank.png', threshold=0.999)
 
-                elif mechanisms.locate_object_template_match('./resources/Factory.png', threshold=0.999, screen=screen) != None:
-                    self.check_factory(screen)
-                    
-                else:
-                    self.check_store(screen, template='./resources/Mine.png', threshold=0.999)
-                    self.check_farm(screen)
+                # Check for enhancers
+                self.check_enhancements(screen)
+
+                # Check for items
+                self.check_items(screen)
 
                 self.click_cookie(screen)
 
-                write_json('./tools/variables.json', variables)
+                write_json('./tools/variables.json', self.variables)
 
             except Exception as e:
                 print(traceback(e))
@@ -58,7 +62,7 @@ class Bot:
         self.is_active = False
     
     def click_cookie(self, screen):
-        cookie = mechanisms.locate_object_template_match('./resources/cookie.png', 0.7, screen)
+        cookie = mechanisms.locate_object_template_match('./resources/cookie.png', 0.95, screen)
         if cookie != None:
             if len(cookie) > 0:
                 mechanisms.click_object((cookie[0], cookie[1]), 800, 0.000001, self.monitor)
@@ -68,6 +72,7 @@ class Bot:
         if factory_loc != None:
             try:
                 mechanisms.click_object(factory_loc, 1, 0, self.monitor)
+                self.variables['Factory_amount'] += 1
             except:
                 pass
 
@@ -76,10 +81,11 @@ class Bot:
         if farm_loc != None:
             try:
                 mechanisms.click_object(farm_loc, 1, 0, self.monitor)
+                self.variables['Farm_amount'] += 1
             except:
                 pass
 
-    def check_store(self, screen, template, threshold):
+    def check_enhancement(self, screen, template, threshold):
         obj = mechanisms.locate_object_template_match(template, threshold, screen)
         if obj != None:
             try:
@@ -87,3 +93,35 @@ class Bot:
                 pass
             except:
                 pass
+    
+    def check_store(self, screen, template, threshold, variable:str):
+        obj = mechanisms.locate_object_template_match(template, threshold, screen)
+        if obj != None:
+            try:
+                mechanisms.click_object(obj, 1, 0, self.monitor)
+                self.variables[variable] += 1
+                pass
+            except:
+                pass
+    
+    def check_enhancements(self, screen):
+        images = os.listdir('./resources/enhancements/')
+
+        for i in images:
+            self.check_enhancement(screen, f'./resources/enhancements/{i}', 0.999)
+
+    def check_items(self, screen):
+        if self.variables['Temple_amount'] < 10:
+            self.check_store(screen, template='./resources/Temple.png', threshold=0.999, variable='Temple_amount')
+
+        if self.variables['Bank_amount'] < 10:
+            self.check_store(screen, template='./resources/Bank.png', threshold=0.999, variable='Bank_amount')
+
+        elif self.variables['Factory_amount'] < 10:
+            self.check_factory(screen)
+            
+        elif self.variables['Mine_amount'] < 15:
+            self.check_store(screen, template='./resources/Mine.png', threshold=0.999, variable='Mine_amount')
+        
+        elif self.variables['Farm_amount'] < 15:
+            self.check_farm(screen)
