@@ -21,6 +21,9 @@ class Bot:
             self.variables['Farm_amount'] = 0
             self.variables['Mine_amount'] = 0
             self.variables['Factory_amount'] = 0
+            self.variables['Bank_amount'] = 0
+            self.variables['Temple_amount'] = 0
+            write_json('./tools/variables.json', self.variables)
 
     def bot_sequence(self):
         self.is_active = True
@@ -32,6 +35,7 @@ class Bot:
             listener.start()
 
             try:
+                #Take and parse screenshot
                 mechanisms.take_screenshot(self.monitor, './tools/ss_cache/screen.png')
                 screen = cv2.imread('./tools/ss_cache/screen.png')
 
@@ -46,6 +50,11 @@ class Bot:
 
                 # Check for enhancers
                 self.check_enhancements(screen)
+
+                #retake/parse screenshot
+                time.sleep(0.5)
+                mechanisms.take_screenshot(self.monitor, './tools/ss_cache/screen.png')
+                screen = cv2.imread('./tools/ss_cache/screen.png')
 
                 # Check for items
                 self.check_items(screen)
@@ -68,7 +77,7 @@ class Bot:
                 mechanisms.click_object((cookie[0], cookie[1]), 800, 0.000001, self.monitor)
 
     def check_factory(self, screen):
-        factory_loc = mechanisms.locate_object_template_match('./resources/Factory.png', 0.99999, screen)
+        factory_loc = mechanisms.locate_object_template_match('./resources/Factory.png', 0.99, screen)
         if factory_loc != None:
             try:
                 mechanisms.click_object(factory_loc, 1, 0, self.monitor)
@@ -77,7 +86,7 @@ class Bot:
                 pass
 
     def check_farm(self, screen):
-        farm_loc = mechanisms.locate_object_template_match('./resources/Farm.png', 0.99999, screen)
+        farm_loc = mechanisms.locate_object_template_match('./resources/Farm.png', 0.99, screen)
         if farm_loc != None:
             try:
                 mechanisms.click_object(farm_loc, 1, 0, self.monitor)
@@ -106,22 +115,21 @@ class Bot:
     
     def check_enhancements(self, screen):
         images = os.listdir('./resources/enhancements/')
-
         for i in images:
-            self.check_enhancement(screen, f'./resources/enhancements/{i}', 0.999)
+            self.check_enhancement(screen, f'./resources/enhancements/{i}', 0.99)
 
     def check_items(self, screen):
         if self.variables['Temple_amount'] < 10:
             self.check_store(screen, template='./resources/Temple.png', threshold=0.999, variable='Temple_amount')
 
         if self.variables['Bank_amount'] < 10:
-            self.check_store(screen, template='./resources/Bank.png', threshold=0.999, variable='Bank_amount')
+            self.check_store(screen, template='./resources/Bank.png', threshold=0.9999, variable='Bank_amount')
 
-        elif self.variables['Factory_amount'] < 10:
+        if self.variables['Factory_amount'] < 10:
             self.check_factory(screen)
             
-        elif self.variables['Mine_amount'] < 15:
-            self.check_store(screen, template='./resources/Mine.png', threshold=0.999, variable='Mine_amount')
+        if self.variables['Mine_amount'] < 15:
+            self.check_store(screen, template='./resources/Mine.png', threshold=0.99, variable='Mine_amount')
         
-        elif self.variables['Farm_amount'] < 15:
+        if self.variables['Farm_amount'] < 15:
             self.check_farm(screen)
