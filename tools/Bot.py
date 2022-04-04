@@ -17,13 +17,7 @@ class Bot:
         self.variables = read_json('./tools/variables.json')
 
         if restart == 'y':
-            self.variables['grandmas_amount'] = 0
-            self.variables['Farm_amount'] = 0
-            self.variables['Mine_amount'] = 0
-            self.variables['Factory_amount'] = 0
-            self.variables['Bank_amount'] = 0
-            self.variables['Temple_amount'] = 0
-            write_json('./tools/variables.json', self.variables)
+            self.restart_variables()
 
     def bot_sequence(self):
         self.is_active = True
@@ -45,8 +39,8 @@ class Bot:
                         mechanisms.click_object(achievements_ignore, 1, 0, self.monitor)
                     except:
                         pass
-                self.variables = read_json(variables_path)
 
+                self.variables = read_json(variables_path)
 
                 # Check for enhancers
                 self.check_enhancements(screen)
@@ -123,7 +117,6 @@ class Bot:
             self.check_store(screen, template='./resources/Temple.png', threshold=0.999, variable='Temple_amount')
 
         if self.variables['Bank_amount'] < 10:
-            print('true')
             self.check_store(screen, template='./resources/Bank.png', threshold=0.988, variable='Bank_amount')
 
         if self.variables['Factory_amount'] < 10:
@@ -134,3 +127,12 @@ class Bot:
         
         if self.variables['Farm_amount'] < 15:
             self.check_farm(screen)
+
+    def restart_variables(self):
+            self.variables['grandmas_amount'] = 0
+            self.variables['Farm_amount'] = 0
+            self.variables['Mine_amount'] = 0
+            self.variables['Factory_amount'] = 0
+            self.variables['Bank_amount'] = 0
+            self.variables['Temple_amount'] = 0
+            write_json('./tools/variables.json', self.variables)
