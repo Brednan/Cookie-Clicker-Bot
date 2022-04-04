@@ -52,7 +52,7 @@ class Bot:
                 self.check_enhancements(screen)
 
                 #retake/parse screenshot
-                time.sleep(0.5)
+                time.sleep(1.5)
                 mechanisms.take_screenshot(self.monitor, './tools/ss_cache/screen.png')
                 screen = cv2.imread('./tools/ss_cache/screen.png')
 
@@ -123,7 +123,8 @@ class Bot:
             self.check_store(screen, template='./resources/Temple.png', threshold=0.999, variable='Temple_amount')
 
         if self.variables['Bank_amount'] < 10:
-            self.check_store(screen, template='./resources/Bank.png', threshold=0.9999, variable='Bank_amount')
+            print('true')
+            self.check_store(screen, template='./resources/Bank.png', threshold=0.988, variable='Bank_amount')
 
         if self.variables['Factory_amount'] < 10:
             self.check_factory(screen)
